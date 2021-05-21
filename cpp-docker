@@ -1,0 +1,14 @@
+#! /bin/bash
+CONTAINER=cpp_docker_env
+WORKDIR=$(pwd)
+
+if ! /usr/bin/docker ps | grep "${CONTAINER}" > /dev/null; then
+  docker-compose up -d
+fi
+
+if [ $# -ne 0 ]; then
+  docker exec -i -t -u dev:dev "${CONTAINER}" bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; $*"
+else
+  # (The shell is interactive if bash is called without arguments :)
+  docker exec -i -t -u dev:dev "${CONTAINER}" bash 
+fi
