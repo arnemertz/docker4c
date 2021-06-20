@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as cpp_ci_image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missin
   gdbserver \
   git \
   locales \
-  python \
+  python-is-python3 \
+  python3 \
   python3-pip \
   shellcheck \
   ssh \
@@ -21,13 +22,15 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missin
   tar \
   valgrind \
   vim \
-  && apt-get autoremove -y && apt-get clean
+  && apt-get autoremove -y && apt-get clean \
+  && pip install conan
 
 # fix "Missing privilege separation directory":
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
 RUN mkdir /run/sshd
 
-RUN locale-gen en_US.utf8 en_GB.utf8 de_DE.utf8 && update-locale
+
+FROM cpp_ci_image as cpp_dev_image
 
 RUN groupadd -g 1000 dev && \
   useradd -m -u 1000 -g 1000 -d /home/dev -s /bin/bash dev && \
