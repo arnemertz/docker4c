@@ -7,7 +7,7 @@ if ! /usr/bin/docker ps | grep "${CONTAINER}" > /dev/null; then
 fi
 
 if [ $# -ne 0 ]; then
-  docker exec -i -t -u dev:dev "${CONTAINER}" bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; $*"
+  docker exec -i -t -u dev:dev "${CONTAINER}" bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; ${*@Q}"
 else
   # (The shell is interactive if bash is called without arguments :)
   docker exec -i -t -u dev:dev "${CONTAINER}" bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; bash"

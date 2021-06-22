@@ -1,6 +1,11 @@
+#######################################
+# CI image:
+#   the one used by your CI server
+#######################################
 FROM ubuntu:20.04 as cpp_ci_image
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG CLANG_VERSION=12
 
 RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missing \
   build-essential \
@@ -22,16 +27,21 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missin
   sudo \
   tar \
   wget \
-  && apt-get autoremove -y && apt-get clean \
+  && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION} \
+  && apt-get -y install clang-tidy-${CLANG_VERSION} \
   && pip install conan \
-  && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-
+  && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
+  && apt-get autoremove -y && apt-get clean
 
 # fix "Missing privilege separation directory":
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
 RUN mkdir /run/sshd
 
 
+#######################################
+# DEV image:
+#   the one you run locally
+#######################################
 FROM cpp_ci_image as cpp_dev_image
 
 RUN apt-get -y install --fix-missing \
