@@ -7,7 +7,8 @@ FROM ubuntu:20.04 as cpp_ci_image
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CLANG_VERSION=12
 
-RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missing \
+RUN apt-get update && apt-get -y dist-upgrade
+RUN apt-get -y install --fix-missing \
   build-essential \
   bzip2 \
   ccache \
@@ -19,6 +20,7 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missin
   git \
   graphviz \
   lsb-release \
+  ninja-build \
   python3 \
   python3-pip \
   shellcheck \
@@ -26,12 +28,11 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --fix-missin
   ssh \
   sudo \
   tar \
-  wget \
-  && wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION} \
-  && apt-get -y install clang-tidy-${CLANG_VERSION} \
-  && pip install conan \
-  && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
-  && apt-get autoremove -y && apt-get clean
+  wget
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION}
+RUN apt-get -y install clang-tidy-${CLANG_VERSION}
+RUN pip install conan
+RUN apt-get autoremove -y && apt-get clean
 
 # fix "Missing privilege separation directory":
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
