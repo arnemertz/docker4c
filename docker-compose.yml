@@ -11,11 +11,7 @@ services:
     image: cppenv:latest
     environment:
         - TERM=xterm-256color # For a colored Terminal
-        - SSH_AUTH_SOCK=/ssh-agent
     volumes:
-        - ${SSH_AUTH_SOCK}:/ssh-agent # Forward local machine SSH to docker
-        - ${HOME}/.ssh/known_hosts:/home/dev/.ssh/known_hosts # If the host trusts, we shall trust as well.
-        - ${HOME}/.ssh/config:/home/dev/.ssh/config
         - ${HOME}/git:/home/dev/git
         - ${HOME}/.gitconfig:/home/dev/.gitconfig
     command: /usr/sbin/sshd -D
