@@ -1,0 +1,83 @@
+#!/bin/bash -e
+
+SCRIPT=$(readlink -f "$0")
+SCRIPT_DIR=$(dirname "${SCRIPT}")
+
+DOCKER_DIR=$(readlink -f "${SCRIPT_DIR}/..")
+COMPOSE_FILE=${DOCKER_DIR}/docker-compose.yml
+
+
+usage() {
+    echo "Docker4c - container(s) for C/C++ development"
+    echo "Usage: $0 <command> [<args>]"
+    echo ""
+    echo "Commands:"
+    echo "  build"  
+    echo "  up"
+    echo "  down"
+    echo "  run"
+    exit 0
+}
+
+
+_compose() {
+    docker-compose -f "$COMPOSE_FILE" "$@"
+}
+
+_container() {
+    _compose ps -q
+}
+
+_is_up() {
+    CONTAINER=$(_container)
+    test -n "$CONTAINER" && docker ps -q --no-trunc | grep "$CONTAINER" > /dev/null
+    return $?
+}
+
+d4c_up() {
+    _compose up -d
+}
+
+d4c_down() {
+    _compose down
+}
+
+d4c_build() {
+    _is_up && d4c_down
+    DOCKER_BUILDKIT=1 docker build -t cppenv:latest .
+}
+
+d4c_run() {
+    _is_up || d4c_up
+    WORKDIR=$(pwd | sed "s#${HOME}#/home/dev#")
+    CONTAINER=$(_compose ps -q)
+
+    if [ $# -ne 0 ]; then
+        # (The shell is interactive if run is called without)
+        docker exec -i -t -u dev:dev $(_container) bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; ${*@Q}"
+    else
+        docker exec -i -t -u dev:dev $(_container) bash -c "if [ -d \"${WORKDIR}\" ]; then cd ${WORKDIR}; fi; bash"
+    fi
+}
+
+
+[ -n "$1" ] || usage
+COMMAND=$1
+shift
+
+case ${COMMAND} in
+    up)
+        d4c_up
+        ;;
+    down)
+        d4c_down
+        ;;
+    build)
+        d4c_build "$@"
+        ;;
+    run)
+        d4c_run "$@"    
+        ;;
+esac
+
+
