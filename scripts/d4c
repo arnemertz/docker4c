@@ -44,7 +44,7 @@ d4c_down() {
 
 d4c_build() {
     _is_up && d4c_down
-    DOCKER_BUILDKIT=1 docker build -t cppenv:latest .
+    DOCKER_BUILDKIT=1 docker build -t cppenv:latest "$DOCKER_DIR"
 }
 
 d4c_run() {
@@ -77,6 +77,9 @@ case ${COMMAND} in
         ;;
     run)
         d4c_run "$@"    
+        ;;
+    *)
+        usage
         ;;
 esac
 

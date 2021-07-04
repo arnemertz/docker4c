@@ -14,6 +14,7 @@ services:
     volumes:
         - ${HOME}/git:/home/dev/git
         - ${HOME}/.gitconfig:/home/dev/.gitconfig
+        - ${HOME}/.conan:/home/dev/.conan
     command: /usr/sbin/sshd -D
     user: root
     network_mode: "bridge"
