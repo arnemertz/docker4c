@@ -12,7 +12,6 @@ RUN apt-get -y install --fix-missing \
   build-essential \
   bzip2 \
   ccache \
-  clang-format \
   cmake \
   cppcheck \
   curl \
@@ -30,7 +29,7 @@ RUN apt-get -y install --fix-missing \
   tar \
   wget
 RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION}
-RUN apt-get -y install clang-tidy-${CLANG_VERSION}
+RUN apt-get -y install clang-format-${CLANG_VERSION} clang-tidy-${CLANG_VERSION}
 RUN pip install conan
 RUN apt-get autoremove -y && apt-get clean
 
