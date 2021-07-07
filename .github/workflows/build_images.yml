@@ -51,7 +51,7 @@ jobs:
           builder: ${{ steps.builder-ci.outputs.name }}
           context: .
           target: cpp_ci_image
-          tags: {% raw %}${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: false
 
@@ -62,10 +62,9 @@ jobs:
           builder: ${{ steps.builder-dev.outputs.name }}
           context: .
           target: cpp_dev_image
-          tags: {% raw %}${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: false
 
       - name: Image digest
-        run: echo ${{ steps.ci_build.outputs.digest }}
-        run: echo ${{ steps.dev_build.outputs.digest }}
+        run: echo ${{ steps.ci_build.outputs.digest }} ${{ steps.dev_build.outputs.digest }}
