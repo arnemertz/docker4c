@@ -32,6 +32,8 @@ RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_V
 RUN apt-get -y install clang-format-${CLANG_VERSION} clang-tidy-${CLANG_VERSION}
 RUN pip install conan
 RUN apt-get autoremove -y && apt-get clean
+RUN for c in $(ls /usr/bin/clang*-${CLANG_VERSION}); do link=$(echo $c | sed "s/-${CLANG_VERSION}//"); ln -sf $c $link; done
+
 
 # fix "Missing privilege separation directory":
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
