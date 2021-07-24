@@ -8,14 +8,15 @@ COMPOSE_FILE=${DOCKER_DIR}/docker-compose.yml
 
 
 usage() {
-    echo "Docker4c - container(s) for C/C++ development"
+    echo "Docker4c - container for C/C++ development"
     echo "Usage: $0 <command> [<args>]"
     echo ""
     echo "Commands:"
-    echo "  build"  
-    echo "  up"
-    echo "  down"
-    echo "  run"
+    echo "  build     - build the container"  
+    echo "  up        - starts the container"
+    echo "  down      - stops and removes the container"
+    echo "  run       - open a shell in the container"
+    echo "  run <cmd> - run <cmd> inside the container"
     exit 0
 }
 
@@ -34,23 +35,22 @@ _is_up() {
     return $?
 }
 
-d4c_up() {
+docker4c_up() {
     _compose up -d
 }
 
-d4c_down() {
+docker4c_down() {
     _compose down
 }
 
-d4c_build() {
-    _is_up && d4c_down
+docker4c_build() {
+    _is_up && docker4c_down
     DOCKER_BUILDKIT=1 docker build -t cppenv:latest "$DOCKER_DIR"
 }
 
-d4c_run() {
-    _is_up || d4c_up
+docker4c_run() {
+    _is_up || docker4c_up
     WORKDIR=$(pwd | sed "s#${HOME}#/home/dev#")
-    CONTAINER=$(_compose ps -q)
 
     if [ $# -ne 0 ]; then
         # (The shell is interactive if run is called without)
@@ -67,16 +67,16 @@ shift
 
 case ${COMMAND} in
     up)
-        d4c_up
+        docker4c_up
         ;;
     down)
-        d4c_down
+        docker4c_down
         ;;
     build)
-        d4c_build "$@"
+        docker4c_build
         ;;
     run)
-        d4c_run "$@"    
+        docker4c_run "$@"    
         ;;
     *)
         usage
