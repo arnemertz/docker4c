@@ -16,8 +16,10 @@ RUN apt-get -y install --fix-missing \
   cppcheck \
   curl \
   doxygen \
+  gcovr \
   git \
   graphviz \
+  linux-tools-generic \
   lsb-release \
   ninja-build \
   python3 \
@@ -28,12 +30,16 @@ RUN apt-get -y install --fix-missing \
   sudo \
   tar \
   unzip \
+  valgrind \
   wget
 RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION}
 RUN apt-get -y install clang-format-${CLANG_VERSION} clang-tidy-${CLANG_VERSION} libclang-${CLANG_VERSION}-dev
 RUN pip install conan
 RUN apt-get autoremove -y && apt-get clean
 RUN for c in $(ls /usr/bin/clang*-${CLANG_VERSION}); do link=$(echo $c | sed "s/-${CLANG_VERSION}//"); ln -sf $c $link; done
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 1000
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 1000
+RUN pip install behave
 
 # fix "Missing privilege separation directory":
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
