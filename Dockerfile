@@ -7,8 +7,11 @@ FROM ubuntu:20.04 as docker4c_ci_image
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CLANG_VERSION=12
 
-RUN apt-get update && apt-get -y dist-upgrade
-RUN apt-get -y install --fix-missing \
+# fix "Missing privilege separation directory":
+# https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
+RUN mkdir -p /run/sshd && \
+  apt-get update && apt-get -y dist-upgrade && \
+  apt-get -y install --fix-missing \
   build-essential \
   bzip2 \
   ccache \
@@ -31,27 +34,28 @@ RUN apt-get -y install --fix-missing \
   tar \
   unzip \
   valgrind \
-  wget
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION}
-RUN apt-get -y install clang-format-${CLANG_VERSION} clang-tidy-${CLANG_VERSION} libclang-${CLANG_VERSION}-dev
-RUN pip install conan
-RUN apt-get autoremove -y && apt-get clean
-RUN for c in $(ls /usr/bin/clang*-${CLANG_VERSION}); do link=$(echo $c | sed "s/-${CLANG_VERSION}//"); ln -sf $c $link; done
-RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 1000
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 1000
-RUN pip install behave
-
-# fix "Missing privilege separation directory":
-# https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
-RUN mkdir /run/sshd
+  wget && \
+  \
+  wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION} && \
+  apt-get -y install \
+  clang-format-${CLANG_VERSION} \
+  clang-tidy-${CLANG_VERSION} \
+  libclang-${CLANG_VERSION}-dev && \
+  \
+  pip install behave conan && \
+  apt-get autoremove -y && apt-get clean && \
+  \
+  for c in $(ls /usr/bin/clang*-${CLANG_VERSION}); do link=$(echo $c | sed "s/-${CLANG_VERSION}//"); ln -sf $c $link; done && \
+  update-alternatives --install /usr/bin/cc cc /usr/bin/clang 1000 && \
+  update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 1000 
 
 # build include-what-you-use in the version that matches CLANG_VERSION (iwyu branch name)
 WORKDIR /var/tmp/build_iwyu
-RUN curl -sSL https://github.com/include-what-you-use/include-what-you-use/archive/refs/heads/clang_${CLANG_VERSION}.zip -o temp.zip
-RUN unzip temp.zip && rm temp.zip && mv include-what-you-use-clang_${CLANG_VERSION}/* . && rm -r include-what-you-use-clang_${CLANG_VERSION}
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -Bcmake-build
-RUN cmake --build cmake-build --target install -- -j ${NCPU}
-RUN ldconfig
+RUN curl -sSL https://github.com/include-what-you-use/include-what-you-use/archive/refs/heads/clang_${CLANG_VERSION}.zip -o temp.zip && \
+  unzip temp.zip && rm temp.zip && mv include-what-you-use-clang_${CLANG_VERSION}/* . && rm -r include-what-you-use-clang_${CLANG_VERSION} && \
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -Bcmake-build && \
+  cmake --build cmake-build --target install -- -j ${NCPU} && \
+  ldconfig
 
 WORKDIR /
 RUN rm -rf /var/tmp/build_iwyu
@@ -68,11 +72,10 @@ RUN apt-get -y install --fix-missing \
   gdb \
   gdbserver \
   python-is-python3 \
-  valgrind \
   vim \
-  && apt-get autoremove -y && apt-get clean
-
-RUN groupadd -g 1000 dev && \
+  && apt-get autoremove -y && apt-get clean && \
+  \
+  groupadd -g 1000 dev && \
   useradd -m -u 1000 -g 1000 -d /home/dev -s /bin/bash dev && \
   usermod -a -G adm,cdrom,sudo,dip,plugdev dev && \
   echo 'dev:dev' | chpasswd && \
