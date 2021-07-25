@@ -58,7 +58,7 @@ jobs:
         with:
           builder: ${{ steps.builder.outputs.name }}
           context: .
-          target: cpp_${{ matrix.target }}_image
+          target: docker4c_${{ matrix.target }}_image
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true

@@ -45,7 +45,7 @@ docker4c_down() {
 
 docker4c_build() {
     _is_up && docker4c_down
-    DOCKER_BUILDKIT=1 docker build -t cppenv:latest "$DOCKER_DIR"
+    DOCKER_BUILDKIT=1 docker build -t docker4c-dev:latest "$DOCKER_DIR"
 }
 
 docker4c_run() {

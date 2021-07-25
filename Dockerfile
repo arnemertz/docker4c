@@ -2,7 +2,7 @@
 # CI image:
 #   the one used by your CI server
 #######################################
-FROM ubuntu:20.04 as cpp_ci_image
+FROM ubuntu:20.04 as docker4c_ci_image
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CLANG_VERSION=12
@@ -61,7 +61,7 @@ RUN rm -rf /var/tmp/build_iwyu
 # DEV image:
 #   the one you run locally
 #######################################
-FROM cpp_ci_image as cpp_dev_image
+FROM docker4c_ci_image as docker4c_dev_image
 
 RUN apt-get -y install --fix-missing \
   cmake-curses-gui \
