@@ -42,7 +42,7 @@ RUN mkdir -p /run/sshd && \
   clang-tidy-${CLANG_VERSION} \
   libclang-${CLANG_VERSION}-dev && \
   \
-  pip install behave conan && \
+  pip install behave conan pexpect requests && \
   apt-get autoremove -y && apt-get clean && \
   \
   for c in $(ls /usr/bin/clang*-${CLANG_VERSION}); do link=$(echo $c | sed "s/-${CLANG_VERSION}//"); ln -sf $c $link; done && \
