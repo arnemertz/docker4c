@@ -15,6 +15,10 @@ RUN mkdir -p /run/sshd && \
   build-essential \
   bzip2 \
   ccache \
+  clang-${CLANG_VERSION} \
+  clangd-${CLANG_VERSION} \
+  clang-format-${CLANG_VERSION} \
+  clang-tidy-${CLANG_VERSION} \
   cmake \
   cppcheck \
   curl \
@@ -22,7 +26,10 @@ RUN mkdir -p /run/sshd && \
   gcovr \
   git \
   graphviz \
+  libclang-${CLANG_VERSION}-dev \
   linux-tools-generic \
+  lldb-${CLANG_VERSION} \
+  lld-${CLANG_VERSION} \
   lsb-release \
   ninja-build \
   python3 \
@@ -35,12 +42,6 @@ RUN mkdir -p /run/sshd && \
   unzip \
   valgrind \
   wget && \
-  \
-  wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh ${CLANG_VERSION} && \
-  apt-get -y install \
-  clang-format-${CLANG_VERSION} \
-  clang-tidy-${CLANG_VERSION} \
-  libclang-${CLANG_VERSION}-dev && \
   \
   pip install behave conan pexpect requests && \
   apt-get autoremove -y && apt-get clean && \
